@@ -1,0 +1,70 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+void main() {
+  runApp(MaterialApp(
+    home: MyApp(),
+  ));
+}
+
+var db = ["rohan", "john", "smith"];
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  var index = 0;
+  var command;
+  var content = "wait for output";
+  name_state() {
+    setState(() {
+      index++;
+      index = index % db.length;
+    });
+    print('clicked and increased');
+    print(index);
+  }
+
+  cmd(command) async {
+    var url = "http://192.168.189.7/cgi-bin/cmd.py?x=${command}";
+    var r = await http.get(url);
+
+    setState(() {
+      content = r.body;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Docker'),
+      ),
+      body: Center(
+        child: Container(
+          height: MediaQuery.of(context).size.height * .8,
+          width: MediaQuery.of(context).size.width * .9,
+          color: Colors.lightBlue[100],
+          child: Column(
+            children: <Widget>[
+              Text('Enter Cmd'),
+              TextField(
+                onChanged: (value) async {
+                  command = value;
+                },
+              ),
+              FlatButton(
+                  onPressed: name_state, child: Text('Submit for name change')),
+              FlatButton(
+                  onPressed: () => cmd(command), child: Text('submit for cmd')),
+              Text(db[index]),
+              Text(content)
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
